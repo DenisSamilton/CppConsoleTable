@@ -1,4 +1,4 @@
-## C++ Console Table
+# C++ Console Table
 With this tool you can make text table in console easy and set up as you need.
 
 ## Integration
