@@ -3,7 +3,7 @@ With this tool you can make text table in console easy and set up as you need.
 
 ## Integration
 
-The single required source, file `CppConsoleTable.hpp` is in the root directory. All you need to do is add
+The single required source, file `CppConsoleTable.hpp` is in the root directory or [released here](https://github.com/Oradle/CppConsoleTable/releases). All you need to do is add
 
 ```cpp
 #include "CppConsoleTable.hpp"
@@ -43,6 +43,20 @@ ConsoleTable table(ConsoleTable::Alignment::right);
 
 // or using a method
 table.setAlignment(ConsoleTable::Alignment::right);
+```
+
+Then, all you need to do is out this table to stream:
+```C++
+// using iostream
+std::cout << table;
+
+// you can also out it to file using fstream
+std::fstream file("test.txt");
+file << table;
+
+// of course you can out it also to stringstream
+std::stringstream stream;
+stream << table;
 ```
 
 Full example of using:
