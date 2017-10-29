@@ -1,14 +1,12 @@
 #include <iostream>
-#include <iomanip>
 
 #include "CppConsoleTable.hpp"
 
-using namespace std;
-using namespace samilton;
+using ConsoleTable = samilton::ConsoleTable;
 
 int main()
 {
-	ConsoleTable table(ConsoleTable::Alignment::right);
+	ConsoleTable table(2, 3, ConsoleTable::Alignment::right);
 
 	table[0][0] = "some";
 	table[1][3] = true;
@@ -17,7 +15,7 @@ int main()
 	table[2][2] = 2.354;
 	table[0][1] = false;
 
-	cout << table;
+	std::cout << table;
 
 	system("pause");
 }
