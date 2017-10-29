@@ -1,5 +1,5 @@
 # C++ Console Table
-With this tool you can make text table in console easy and set up as you need.
+With this tool you can make text table in console easily and set up as you need.
 
 ## Integration
 
@@ -45,7 +45,22 @@ ConsoleTable table(ConsoleTable::Alignment::right);
 table.setAlignment(ConsoleTable::Alignment::right);
 ```
 
+If you need to change the characters of table, you can easily do it with TableChars struct:
+```C++
+// creating struct
+ConsoleTable::TableChars chars;
+
+// modifying characters
+chars.topDownSimple = '-';
+chars.leftSeparation = '+';
+
+// changing characters in table
+table.setTableChars(chars);
+```
+
+
 Then, all you need to do is out this table to stream:
+
 ```C++
 // using iostream
 std::cout << table;
