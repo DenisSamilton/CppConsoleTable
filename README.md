@@ -31,7 +31,7 @@ table[1][0] = true;
 // add a number of int type
 table[2][1] = 56;
 
-// add a "const char[]" string (it also could be and std::string)
+// add a "const char[]" string (it also could be an std::string)
 table[2][0] = "some";
 ```
 
