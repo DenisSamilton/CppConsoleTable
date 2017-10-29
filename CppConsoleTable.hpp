@@ -117,6 +117,13 @@ namespace samilton {
 			right
 		};
 
+		struct TableChars {
+			char topRight = 187, topLeft = 201, downRight = 188, downLeft = 200;
+			char topDownSimple = 205, topSeparation = 203, downSeparation = 202;
+			char leftRightSimple = 186, leftSeparation = 204, rightSeparation = 185;
+			char centreSeparation = 206;
+		};
+
 		ConsoleTable() {
 			_alignment = Alignment::left;
 			_leftIndent = 0;
@@ -151,6 +158,10 @@ namespace samilton {
 			_rightIndent = rightIndent;
 		}
 
+		void setTableChars(const TableChars &chars) {
+			_chars = chars;
+		}
+
 		ConsoleRow &operator[](const size_t &row) {
 			try {
 				return *_tableData.at(row);
@@ -173,6 +184,7 @@ namespace samilton {
 				stream << std::setfill(fillChar) << std::setw(lenght) << endChar;
 		}
 
+		TableChars _chars;
 		std::map<size_t, ConsoleRow*> _tableData;
 		Alignment _alignment;
 		size_t _leftIndent, _rightIndent;
@@ -206,22 +218,16 @@ namespace samilton {
 			columnWidth.push_back(tmp);
 		}
 
-		// Set up every symbol
-		const char topRight = 187, topLeft = 201, downRight = 188, downLeft = 200;
-		const char topDownSimple = 205, topSeparation = 203, downSeparation = 202;
-		const char leftRightSimple = 186, leftSeparation = 204, rightSeparation = 185;
-		const char centreSeparation = 206;
-
 		if (table._alignment != ConsoleTable::Alignment::centre) {
-			stream << std::right << topLeft;
-			table._fillStreamByChar(stream, topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
+			stream << std::right << table._chars.topLeft;
+			table._fillStreamByChar(stream, table._chars.topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
 
 			if (column != 1) {
 				for (size_t i = 1; i < column; i++) {
-					stream << topSeparation << std::setw(columnWidth[i] + 1 + table._leftIndent + table._rightIndent);
+					stream << table._chars.topSeparation << std::setw(columnWidth[i] + 1 + table._leftIndent + table._rightIndent);
 				}
 			}
-			stream << topRight << std::endl;
+			stream << table._chars.topRight << std::endl;
 
 			for (size_t i = 0; i < row; i++) {
 				if (table._alignment == ConsoleTable::Alignment::left)
@@ -231,7 +237,7 @@ namespace samilton {
 
 				for (size_t j = 0; j < column; j++) {
 					if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr) {
-						stream << leftRightSimple;
+						stream << table._chars.leftRightSimple;
 						table._fillStreamByChar(stream, ' ', ' ', table._leftIndent);
 
 						table._fillStreamByChar(stream, ' ', columnWidth[j]);
@@ -240,7 +246,7 @@ namespace samilton {
 						table._fillStreamByChar(stream, ' ', ' ', table._rightIndent);
 					}
 					else {
-						stream << leftRightSimple;
+						stream << table._chars.leftRightSimple;
 						table._fillStreamByChar(stream, ' ', ' ', table._leftIndent);
 
 						table._fillStreamByChar(stream, ' ', columnWidth[j]);
@@ -249,29 +255,29 @@ namespace samilton {
 						table._fillStreamByChar(stream, ' ', ' ', table._rightIndent);
 					}
 				}
-				stream << std::right << leftRightSimple << std::endl;
+				stream << std::right << table._chars.leftRightSimple << std::endl;
 
 				if (i == row - 1) {
-					stream << downLeft;
-					table._fillStreamByChar(stream, topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
+					stream << table._chars.downLeft;
+					table._fillStreamByChar(stream, table._chars.topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
 
 					if (column != 1) {
 						for (size_t j = 1; j < column; j++) {
-							stream << downSeparation << std::setw(columnWidth[j] + 1 + table._leftIndent + table._rightIndent);
+							stream << table._chars.downSeparation << std::setw(columnWidth[j] + 1 + table._leftIndent + table._rightIndent);
 						}
 					}
-					stream << downRight << std::endl;
+					stream << table._chars.downRight << std::endl;
 				}
 				else {
-					stream << leftSeparation;
-					table._fillStreamByChar(stream, topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
+					stream << table._chars.leftSeparation;
+					table._fillStreamByChar(stream, table._chars.topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
 
 					if (column != 1) {
 						for (size_t j = 1; j < column; j++) {
-							stream << centreSeparation << std::setw(columnWidth[j] + 1 + table._leftIndent + table._rightIndent);
+							stream << table._chars.centreSeparation << std::setw(columnWidth[j] + 1 + table._leftIndent + table._rightIndent);
 						}
 					}
-					stream << rightSeparation << std::endl;
+					stream << table._chars.rightSeparation << std::endl;
 				}
 			}
 		}
