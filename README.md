@@ -45,7 +45,18 @@ ConsoleTable table(ConsoleTable::Alignment::right);
 table.setAlignment(ConsoleTable::Alignment::right);
 ```
 
+If you need indent before or after your elements, you can change it:
+
+```C++
+// using constructor
+ConsoleTable table(2, 3);
+
+// or using a method
+table.setIndent(2, 3);
+```
+
 Then, all you need to do is out this table to stream:
+
 ```C++
 // using iostream
 std::cout << table;
@@ -71,7 +82,7 @@ using ConsoleTable = samilton::ConsoleTable;
 
 int main()
 {
-	ConsoleTable table(ConsoleTable::Alignment::right);
+	ConsoleTable table(2, 1, ConsoleTable::Alignment::right);
 
 	table[0][0] = "some";
 	table[1][3] = true;
@@ -87,15 +98,15 @@ int main()
 ```
 Output:
 ```
-╔════╦═════╦════════╦════╗
-║some║false║        ║    ║
-╠════╬═════╬════════╬════╣
-║    ║     ║        ║true║
-╠════╬═════╬════════╬════╣
-║    ║   10║2.354000║    ║
-╠════╬═════╬════════╬════╣
-║    ║     ║        ║ bla║
-╚════╩═════╩════════╩════╝
+╔═══════╦════════╦═══════════╦═══════╗
+║  some ║  false ║           ║       ║
+╠═══════╬════════╬═══════════╬═══════╣
+║       ║        ║           ║  true ║
+╠═══════╬════════╬═══════════╬═══════╣
+║       ║     10 ║  2.354000 ║       ║
+╠═══════╬════════╬═══════════╬═══════╣
+║       ║        ║           ║   bla ║
+╚═══════╩════════╩═══════════╩═══════╝
 ```
 
 ## License
