@@ -1,4 +1,7 @@
 # C++ Console Table
+
+[**На русском**](https://github.com/Oradle/CppConsoleTable/blob/master/README_RU.md)
+
 With this tool you can make text table in console easily and set up as you need.
 
 ## Integration
