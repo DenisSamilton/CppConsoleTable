@@ -75,6 +75,9 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.sln
+*.vcxproj
+*.filters
 
 # Chutzpah Test files
 _Chutzpah*
@@ -297,3 +300,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Testing cpp's
+Testing.cpp
