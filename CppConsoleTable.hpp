@@ -335,6 +335,12 @@ namespace samilton {
 		if (table._tableData.empty())
 			return stream;
 		
+		// Read width member and use it as indentation parameter if nonzero
+		const auto tableIndentation = stream.width() > 0 ? stream.width() : 0;
+		
+		// Reset width to 0 for subsequent calls to this stream
+		stream.width(0);
+		
 		// Calculation width of every column
 		std::vector<size_t> columnWidth;
 		for (size_t i = 0; i < table._columnSize; i++) {
@@ -367,6 +373,7 @@ namespace samilton {
 		}
 
 		// Top border
+		ConsoleTable::_fillStreamByChar(stream, ' ', ' ', static_cast<size_t>(tableIndentation));
 		stream << std::right << table._chars.topLeft;
 		ConsoleTable::_fillStreamByChar(stream, table._chars.topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
 
@@ -380,6 +387,7 @@ namespace samilton {
 		// Elements and middle borders
 		for (size_t i = 0; i < table._rowSize; i++) {
 			for (size_t k = 0; k < rowHeight[i]; ++k) {
+				ConsoleTable::_fillStreamByChar(stream, ' ', ' ', static_cast<size_t>(tableIndentation));
 				for (size_t j = 0; j < table._columnSize; j++) {
 					if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr && k < table._tableData[i]->_rowData[j]->_lineCount) {
 						if (table._alignment == ConsoleTable::Alignment::centre) {
@@ -439,6 +447,7 @@ namespace samilton {
 			}
 
 			// Down border
+			ConsoleTable::_fillStreamByChar(stream, ' ', ' ', static_cast<size_t>(tableIndentation));
 			if (i == table._rowSize - 1) {
 				stream << table._chars.downLeft;
 				ConsoleTable::_fillStreamByChar(stream, table._chars.topDownSimple, columnWidth[0] + 1 + table._leftIndent + table._rightIndent);
