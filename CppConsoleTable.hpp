@@ -74,12 +74,16 @@ namespace samilton {
 			return *this;
 		}
 
+		ConsoleString &operator=(const char &val) {
+			clear();
+			_parseString(std::string(1, val));
+			return *this;
+		}
+
 		template<class T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 		ConsoleString &operator=(const T &val) {
 			clear();
-			_str = new std::string;
-
-			*_str = std::to_string(val);
+			_str = new std::string(std::to_string(val));
 			return *this;
 		}
 
