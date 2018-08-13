@@ -1,4 +1,14 @@
-# C++ Console Table
+<p align="center">
+<img src="https://lh3.googleusercontent.com/QLx9TsSHq9v7E67EZXvrImzdo7s9_3572ikFL5Q35-eIuLG2RthAI4JyGobylI4J3L_NhNesi4LVfUhMCHvd6RLh5f3998g4EDZzyh5Mq99JNBhUGf7DKXGGQ1tfk588VectgFbhqkVqwNAtV1hGjM8JS-p3AHDYA69zNMKRMA_fpfHoAaqjSu7Ai4pTTavSvYIjY3dkfmYredSsO82xXBxtLmHKHzVgUpj2ghXQzojh7HVSVhh3t5IPNumW3fgkoagum_XVNIuf6PFlZvN4bt4ce7jmrOftdPMqeyg2VqaaJ9mQ2UiHoALszH7I37SujHKQtMM-pRI006_Zhtz0lR_iWiZAJeaYROa_OeEXRFg9zv9iHCnAenNZKgTQsFhoH9XD9ssQrGoNh6jCwP8qWo-Hpws1bvCPfsFSd9gV7nyHGEuZKP2FxjbUHG7OCFmB9nIDtP5vhfHpelAaCOGHsH3BEOZdRNcp_KEYeJQVvhi3A6ptueKeyT6lAvp-QjXRXT2OuimZMh_wBPi6h4XAilUkdsHPqqFvvQHtwtJxD7TULEbEfAEpoHoX8TqNAjalQu2LYFpZOgO0NFPYQwXb7oS7fDdVXrPJgIYRonPhhCZvLwLvCUI3O64pVZzWZHO4M5Iu1jJfYRJwTxvOXC12qjQ9kQ=w832-h161-no" width="491" height="95">
+<br><br>
+<a href="https://opensource.org/licenses/MIT" alt="License">
+	<img src="https://img.shields.io/github/license/Oradle/CppConsoleTable.svg" /></a>
+<a href="https://github.com/Oradle/CppConsoleTable/issues" alt="Open issues">
+        <img src="https://img.shields.io/github/issues/Oradle/CppConsoleTable.svg" /></a>
+<a href="https://github.com/Oradle/CppConsoleTable/releases/latest" alt="Latest release">
+        <img src="https://img.shields.io/github/release/Oradle/CppConsoleTable.svg" /></a>
+</p>
+
 С этой утилитой вы можете делать текстовые таблици в консоле легко и настраивать их так, как вам нужно
 
 ## Интеграция
