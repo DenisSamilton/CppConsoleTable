@@ -44,8 +44,10 @@ namespace samilton {
 
 	class ConsoleString {
 	public:
-		ConsoleString(ConsoleRow *parent) {
-			_parent = parent;
+		ConsoleString() = default;
+
+		ConsoleString(const ConsoleString &obj) {
+			*this = obj;
 		}
 
 		void clear() {
@@ -99,6 +101,29 @@ namespace samilton {
 			return *this;
 		}
 
+		ConsoleString &operator=(const ConsoleString &obj) {
+			clear();
+			_lineCount = obj._lineCount;
+
+			// Copying string values
+			if (_lineCount > 1) {
+				_str = new std::string[_lineCount];
+				for (size_t i = 0; i < _lineCount; ++i) {
+					_str[i] = obj._str[i];
+				}
+			}
+			else {
+				if (obj._str != nullptr) {
+					_str = new std::string(*obj._str);
+				}
+				else {
+					_str = nullptr;
+				}
+			}
+
+			return *this;
+		}
+
 		~ConsoleString() {
 			clear();
 		}
@@ -127,7 +152,6 @@ namespace samilton {
 			}
 		}
 
-		ConsoleRow *_parent;
 		std::string *_str = nullptr;
 		size_t _lineCount = 1;
 	};
@@ -138,6 +162,29 @@ namespace samilton {
 			_parent = parent;
 		}
 
+		ConsoleRow(const ConsoleRow &obj) = delete;
+
+		ConsoleRow(const ConsoleRow &obj, ConsoleTable *parent) {
+			_parent = parent;
+			*this = obj;
+		}
+
+		void clear() {
+			for (auto &i : _rowData) {
+				delete i.second;
+			}
+			_rowData.clear();
+		}
+
+		ConsoleRow &operator=(const ConsoleRow &obj) {
+			clear();
+
+			for (auto &i : obj._rowData)
+				_rowData[i.first] = new ConsoleString(*i.second);
+
+			return *this;
+		}
+
 		~ConsoleRow() {
 			for (auto &element : _rowData) {
 				delete element.second;
@@ -145,7 +192,7 @@ namespace samilton {
 			_rowData.clear();
 		}
 
-		ConsoleString &operator[](const size_t column);
+		ConsoleString &operator[](size_t column);
 	private:
 		friend std::ostream &operator<<(std::ostream &stream, ConsoleTable &table);
 
@@ -162,10 +209,10 @@ namespace samilton {
 		};
 
 		struct TableChars {
-			char topRight = 187, topLeft = 201, downRight = 188, downLeft = 200;
-			char topDownSimple = 205, topSeparation = 203, downSeparation = 202;
-			char leftRightSimple = 186, leftSeparation = 204, rightSeparation = 185;
-			char centreSeparation = 206;
+			unsigned char topRight = 187, topLeft = 201, downRight = 188, downLeft = 200;
+			unsigned char topDownSimple = 205, topSeparation = 203, downSeparation = 202;
+			unsigned char leftRightSimple = 186, leftSeparation = 204, rightSeparation = 185;
+			unsigned char centreSeparation = 206;
 		};
 
 		ConsoleTable() {
@@ -183,6 +230,10 @@ namespace samilton {
 			_rightIndent = rightIndent;
 			_alignment = alignment;
 			_rowSize = _columnSize = 0;
+		}
+
+		ConsoleTable(const ConsoleTable &obj) {
+			*this = obj;
 		}
 
 		~ConsoleTable() {
@@ -283,7 +334,23 @@ namespace samilton {
 			return *this;
 		}
 
-		ConsoleRow &operator[](const size_t row);
+		ConsoleTable &operator=(const ConsoleTable &obj) {
+			clear();
+
+			_chars = obj._chars;
+			_alignment = obj._alignment;
+			_leftIndent = obj._leftIndent;
+			_rightIndent = obj._rightIndent;
+			_rowSize = obj._rowSize;
+			_columnSize = obj._columnSize;
+
+			for (auto &i : obj._tableData)
+				_tableData[i.first] = new ConsoleRow(*i.second, this);
+
+			return *this;
+		}
+
+		ConsoleRow &operator[](size_t row);
 
 		friend std::ostream &operator>>(ConsoleTable &table, std::ostream &stream) {
 			return stream << table;
@@ -291,7 +358,7 @@ namespace samilton {
 
 		friend std::ostream &operator<<(std::ostream &stream, ConsoleTable &table);
 	private:
-		friend ConsoleString &ConsoleRow::operator[](const size_t column);
+		friend ConsoleString &ConsoleRow::operator[](size_t column);
 
 		static void _fillStreamByChar(std::ostream &stream, const char &fillChar, const size_t &lenght) {
 			if (lenght > 0)
@@ -329,7 +396,7 @@ namespace samilton {
 		catch (...) {
 			_parent->_columnSize = std::max(_parent->_columnSize, column + 1);
 
-			_rowData[column] = new ConsoleString(this);
+			_rowData[column] = new ConsoleString();
 			return *_rowData[column];
 		}
 	}
