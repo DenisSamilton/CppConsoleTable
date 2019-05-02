@@ -33,6 +33,7 @@ SOFTWARE.
 #include <iomanip> // setfill, setw, right, left
 #include <iostream> // ostream, endl
 #include <map> // map
+#include <stdexcept> // invalid_argument
 #include <string> // string, to_string, const_iterator
 #include <type_traits> // enable_if, is_arithmetic, is_same, remove_pointer
 #include <vector> // vector
@@ -41,6 +42,12 @@ namespace samilton {
 	// force declaration
 	class ConsoleTable;
 	class ConsoleRow;
+
+	enum class Alignment {
+		left = 0,
+		centre,
+		right
+	};
 
 	class ConsoleString {
 	public:
@@ -51,17 +58,7 @@ namespace samilton {
 		}
 
 		void clear() {
-			if (_str != nullptr) {
-				if (_lineCount > 1) {
-					delete[] _str;
-				}
-				else {
-					delete _str;
-				}
-
-				_str = nullptr;
-				_lineCount = 1;
-			}
+			_str.clear();
 		}
 
 		ConsoleString &operator=(const std::string &val) {
@@ -85,43 +82,58 @@ namespace samilton {
 		template<class T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 		ConsoleString &operator=(const T &val) {
 			clear();
-			_str = new std::string(std::to_string(val));
+			_str.push_back(std::to_string(val));
 			return *this;
 		}
 
 		ConsoleString &operator=(const bool &val) {
 			clear();
-			_str = new std::string;
 
 			if (val)
-				*_str = "true";
+				_str.emplace_back("true");
 			else
-				*_str = "false";
+				_str.emplace_back("false");
 
 			return *this;
 		}
 
 		ConsoleString &operator=(const ConsoleString &obj) {
 			clear();
-			_lineCount = obj._lineCount;
+			_alignment = obj._alignment;
+			_str = obj._str;
 
-			// Copying string values
-			if (_lineCount > 1) {
-				_str = new std::string[_lineCount];
-				for (size_t i = 0; i < _lineCount; ++i) {
-					_str[i] = obj._str[i];
-				}
+			return *this;
+		}
+
+		template<typename T, typename... Args>
+		auto operator()(T firstArg, Args... args) {
+			if constexpr(std::is_same<T, nullptr_t>::value)
+				(*this)(args..., nullptr);
+			else
+				return *this;
+			
+			if constexpr(std::is_same<T, Alignment>::value) {
+				_alignment = firstArg;
 			}
 			else {
-				if (obj._str != nullptr) {
-					_str = new std::string(*obj._str);
-				}
-				else {
-					_str = nullptr;
-				}
+				throw std::invalid_argument("args");
 			}
 
 			return *this;
+
+			/*if conste(typeid(T) == typeid(Alignment))
+				_alignment = firstArg;
+
+			const size_t argSize = (*this)(args...);
+			if constexpr(argSize > sizeof...(args)) {
+				return;
+			}
+			else if constexpr(n > 0) {
+				return (*this)(args...);
+			}
+			else {
+				return x;
+			}*/
 		}
 
 		~ConsoleString() {
@@ -129,31 +141,21 @@ namespace samilton {
 		}
 	private:
 		friend std::ostream &operator<<(std::ostream &stream, ConsoleTable &table);
+
 		void _parseString(const std::string &val) {
-			std::vector<std::string::const_iterator> lineEndingMarks;
+			auto tmpIterator = val.begin();
 			for (auto i = val.begin(); i < val.end(); ++i) {
 				if (*i == '\n') {
-					++_lineCount;
-					lineEndingMarks.push_back(i);
+					_str.emplace_back(tmpIterator, i);
+					tmpIterator = i + 1;
 				}
 			}
 
-			if (_lineCount > 1) {
-				_str = new std::string[_lineCount];
-
-				_str[0].assign(val.begin(), lineEndingMarks[0]);
-				for (size_t i = 1; i < lineEndingMarks.size(); ++i) {
-					_str[i].assign(lineEndingMarks[i - 1] + 1, lineEndingMarks[i]);
-				}
-				_str[_lineCount - 1].assign(lineEndingMarks[_lineCount - 2] + 1, val.end());
-			}
-			else {
-				_str = new std::string(val);
-			}
+			_str.emplace_back(tmpIterator, val.end());
 		}
 
-		std::string *_str = nullptr;
-		size_t _lineCount = 1;
+		std::vector<std::string> _str;
+		Alignment _alignment = Alignment::left;
 	};
 
 	class ConsoleRow {
@@ -186,10 +188,7 @@ namespace samilton {
 		}
 
 		~ConsoleRow() {
-			for (auto &element : _rowData) {
-				delete element.second;
-			}
-			_rowData.clear();
+			clear();
 		}
 
 		ConsoleString &operator[](size_t column);
@@ -202,12 +201,6 @@ namespace samilton {
 
 	class ConsoleTable {
 	public:
-		enum class Alignment {
-			left = 0,
-			centre,
-			right
-		};
-
 		struct TableChars {
 			unsigned char topRight = 187, topLeft = 201, downRight = 188, downLeft = 200;
 			unsigned char topDownSimple = 205, topSeparation = 203, downSeparation = 202;
@@ -418,13 +411,8 @@ namespace samilton {
 			size_t tmp = 1;
 			for (size_t j = 0; j < table._rowSize; j++) {
 				if (table._tableData[j] != nullptr && table._tableData[j]->_rowData[i] != nullptr) {
-					if (table._tableData[j]->_rowData[i]->_lineCount == 1) {
-						tmp = std::max(tmp, table._tableData[j]->_rowData[i]->_str->size());
-					}
-					else {
-						for (size_t k = 0; k < table._tableData[j]->_rowData[i]->_lineCount; ++k) {
-							tmp = std::max(tmp, table._tableData[j]->_rowData[i]->_str[k].size());
-						}
+					for (const auto& k : table._tableData[j]->_rowData[i]->_str) {
+						tmp = std::max(tmp, k.size());
 					}
 				}
 			}
@@ -437,7 +425,7 @@ namespace samilton {
 			size_t tmp = 1;
 			for (size_t j = 0; j < table._columnSize; j++) {
 				if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr) {
-					tmp = std::max(tmp, table._tableData[i]->_rowData[j]->_lineCount);
+					tmp = std::max(tmp, table._tableData[i]->_rowData[j]->_str.size());
 				}
 			}
 			rowHeight.push_back(tmp);
@@ -457,38 +445,34 @@ namespace samilton {
 
 		// Elements and middle borders
 		for (size_t i = 0; i < table._rowSize; i++) {
-			for (size_t k = 0; k < rowHeight[i]; ++k) {
+			for (size_t k = 0; k < rowHeight[i]; ++k) { // Loop for multiline cells
 				ConsoleTable::_fillStreamByChar(stream, ' ', ' ', static_cast<size_t>(tableIndentation));
-				for (size_t j = 0; j < table._columnSize; j++) {
-					if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr && k < table._tableData[i]->_rowData[j]->_lineCount) {
-						if (table._alignment == ConsoleTable::Alignment::centre) {
-							const size_t tmp = k < table._tableData[i]->_rowData[j]->_lineCount
-								                   ? columnWidth[j] - table._tableData[i]->_rowData[j]->_str[k].size()
-								                   : columnWidth[j] - table._tableData[i]->_rowData[j]->_str->size();
+				for (size_t j = 0; j < table._columnSize; j++) {		
+					
+					// If cell has data and current line of cell not empty
+					if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr && k < table._tableData[i]->_rowData[j]->_str.size()) {
+						if (table._alignment == Alignment::centre) {
+							const size_t leftSpaceInCell = columnWidth[j] - table._tableData[i]->_rowData[j]->_str[k].size();
 
 							size_t leftAlignmentIndent, rightAlignmentIndent;
-							if (tmp % 2) {
-								leftAlignmentIndent = tmp / 2;
-								rightAlignmentIndent = tmp / 2 + 1;
+							if (leftSpaceInCell % 2) {
+								leftAlignmentIndent = leftSpaceInCell / 2;
+								rightAlignmentIndent = leftSpaceInCell / 2 + 1;
 							}
 							else {
-								leftAlignmentIndent = rightAlignmentIndent = tmp / 2;
+								leftAlignmentIndent = rightAlignmentIndent = leftSpaceInCell / 2;
 							}
 
 							stream << table._chars.leftRightSimple;
 							ConsoleTable::_fillStreamByChar(stream, ' ', ' ', table._leftIndent + leftAlignmentIndent);
 
-							if (k < table._tableData[i]->_rowData[j]->_lineCount)
-								stream << table._tableData[i]->_rowData[j]->_str[k];
-							else
-								stream << *table._tableData[i]->_rowData[j]->_str;
-
+							stream << table._tableData[i]->_rowData[j]->_str[k];
 							ConsoleTable::_fillStreamByChar(stream, ' ', ' ', table._rightIndent + rightAlignmentIndent);
 						}
 						else {
-							if (table._alignment == ConsoleTable::Alignment::left)
+							if (table._alignment == Alignment::left)
 								stream << std::left;
-							else if (table._alignment == ConsoleTable::Alignment::right)
+							else if (table._alignment == Alignment::right)
 								stream << std::right;
 
 							stream << table._chars.leftRightSimple;
@@ -496,15 +480,11 @@ namespace samilton {
 
 							ConsoleTable::_fillStreamByChar(stream, ' ', columnWidth[j]);
 							
-							if (k < table._tableData[i]->_rowData[j]->_lineCount)
-								stream << table._tableData[i]->_rowData[j]->_str[k];
-							else
-								stream << *table._tableData[i]->_rowData[j]->_str;
-
+							stream << table._tableData[i]->_rowData[j]->_str[k];
 							ConsoleTable::_fillStreamByChar(stream, ' ', ' ', table._rightIndent);
 						}
 					}
-					else {
+					else { // If cell hasn't any data or current line of cell is empty
 						stream << table._chars.leftRightSimple;
 						ConsoleTable::_fillStreamByChar(stream, ' ', ' ', table._leftIndent);
 
