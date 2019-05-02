@@ -374,7 +374,7 @@ namespace samilton {
 		try {
 			return *_tableData.at(row);
 		}
-		catch (...) {
+		catch (std::out_of_range&) {
 			_rowSize = std::max(_rowSize, row + 1);
 
 			_tableData[row] = new ConsoleRow(this);
@@ -386,7 +386,7 @@ namespace samilton {
 		try {
 			return *_rowData.at(column);
 		}
-		catch (...) {
+		catch (std::out_of_range&) {
 			_parent->_columnSize = std::max(_parent->_columnSize, column + 1);
 
 			_rowData[column] = new ConsoleString();
