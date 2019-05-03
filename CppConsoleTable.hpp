@@ -32,6 +32,7 @@ SOFTWARE.
 #include <algorithm> // max
 #include <iomanip> // setfill, setw, right, left
 #include <iostream> // ostream, endl
+#include <initializer_list> // initializer_list
 #include <map> // map
 #include <stdexcept> // invalid_argument
 #include <string> // string, to_string, const_iterator
@@ -258,6 +259,17 @@ namespace samilton {
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
 		std::is_same<char*, T>::value>::type>
+		void addRow(const std::initializer_list<T> &row) {
+			const size_t tmp = _rowSize;
+			for (size_t i = 0; i < row.size(); i++) {
+				(*this)[tmp][i] = *(row.begin() + i);
+			}
+		}
+
+		template<class T,
+		class = typename std::enable_if<std::is_arithmetic<T>::value ||
+		std::is_same<std::string, T>::value ||
+		std::is_same<char*, T>::value>::type>
 		void addColumn(const std::vector<T> &column) {
 			const size_t tmp = _columnSize;
 			for (size_t i = 0; i < column.size(); i++) {
@@ -272,6 +284,17 @@ namespace samilton {
 			const size_t tmp = _columnSize;
 			for (size_t i = 0; i < size; i++) {
 				(*this)[i][tmp] = column[i];
+			}
+		}
+
+		template<class T,
+		class = typename std::enable_if<std::is_arithmetic<T>::value ||
+		std::is_same<std::string, T>::value ||
+		std::is_same<char*, T>::value>::type>
+		void addColumn(const std::initializer_list<T> &column) {
+			const size_t tmp = _columnSize;
+			for (size_t i = 0; i < column.size(); i++) {
+				(*this)[i][tmp] = *(column.begin() + i);
 			}
 		}
 
@@ -294,6 +317,17 @@ namespace samilton {
 			for (size_t i = 0; i < columnSize; i++)
 				for (size_t j = 0; j < rowSize; j++)
 					(*this)[i][j] = table[i][j];
+		}
+
+		template<class T,
+		class = typename std::enable_if<std::is_arithmetic<T>::value ||
+		std::is_same<std::string, T>::value ||
+		std::is_same<char*, T>::value>::type>
+		void assign(const std::initializer_list<std::initializer_list<T>> &table) {
+			clear();
+			for (size_t i = 0; i < table.size(); i++)
+				for (size_t j = 0; j < (table.begin() + i)->size(); j++)
+					(*this)[i][j] = *((table.begin() + i)->begin() + j);
 		}
 		
 		void clear() {
@@ -323,6 +357,15 @@ namespace samilton {
 		std::is_same<std::string, T>::value ||
 		std::is_same<char*, T>::value>::type>
 		ConsoleTable &operator=(const std::vector<std::vector<T>> &table) {
+			assign(table);
+			return *this;
+		}
+
+		template<class T,
+		class = typename std::enable_if<std::is_arithmetic<T>::value ||
+		std::is_same<std::string, T>::value ||
+		std::is_same<char*, T>::value>::type>
+		ConsoleTable &operator=(const std::initializer_list<std::initializer_list<T>> &table) {
 			assign(table);
 			return *this;
 		}
