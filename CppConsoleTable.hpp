@@ -1,10 +1,10 @@
 /*
  =========================    Cpp Console Table
- | Cpp | Console | Table |    version 1.2.0
- =========================    https://github.com/Oradle/CppConsoleTable
+ | Cpp | Console | Table |    version 1.3.0
+ =========================    https://github.com/DenisSamilton/CppConsoleTable
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2017 Oradle
+Copyright (c) 2019 DenisSamilton
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@ SOFTWARE.
 #include <initializer_list> // initializer_list
 #include <map> // map
 #include <optional> // optional
-#include <stdexcept> // invalid_argument
-#include <string> // string, to_string, const_iterator
+#include <stdexcept> // invalid_argument, out_of_range
+#include <string> // string, to_string
 #include <type_traits> // enable_if, is_arithmetic, is_same, remove_pointer
 #include <vector> // vector
 
@@ -369,7 +369,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		ConsoleTable &operator=(const std::initializer_list<std::initializer_list<T>> &table) {
 			assign(table);
 			return *this;
