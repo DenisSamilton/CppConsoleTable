@@ -263,7 +263,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void addRow(const std::initializer_list<T> &row) {
 			const size_t tmp = _rowSize;
 			for (size_t i = 0; i < row.size(); i++) {
@@ -295,7 +295,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void addColumn(const std::initializer_list<T> &column) {
 			const size_t tmp = _columnSize;
 			for (size_t i = 0; i < column.size(); i++) {
@@ -327,7 +327,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void assign(const std::initializer_list<std::initializer_list<T>> &table) {
 			clear();
 			for (size_t i = 0; i < table.size(); i++)
