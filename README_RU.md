@@ -9,8 +9,6 @@
         <img src="https://img.shields.io/github/release/DenisSamilton/CppConsoleTable.svg" /></a>
 </p>
 
-:ru:[**На русском**](https://github.com/DenisSamilton/CppConsoleTable/blob/master/README_RU.md)
-
 С этой утилитой вы можете делать текстовые таблици в консоле легко и настраивать их так, как вам нужно
 
 ## Интеграция
