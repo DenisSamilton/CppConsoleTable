@@ -1,10 +1,10 @@
 /*
  =========================    Cpp Console Table
- | Cpp | Console | Table |    version 1.2.0
- =========================    https://github.com/Oradle/CppConsoleTable
+ | Cpp | Console | Table |    version 1.3.0
+ =========================    https://github.com/DenisSamilton/CppConsoleTable
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2017 Oradle
+Copyright (c) 2019 DenisSamilton
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,9 @@ SOFTWARE.
 #include <iostream> // ostream, endl
 #include <initializer_list> // initializer_list
 #include <map> // map
-#include <stdexcept> // invalid_argument
-#include <string> // string, to_string, const_iterator
+#include <optional> // optional
+#include <stdexcept> // invalid_argument, out_of_range
+#include <string> // string, to_string
 #include <type_traits> // enable_if, is_arithmetic, is_same, remove_pointer
 #include <vector> // vector
 
@@ -107,34 +108,20 @@ namespace samilton {
 		}
 
 		template<typename T, typename... Args>
-		auto operator()(T firstArg, Args... args) {
-			if constexpr(std::is_same<T, nullptr_t>::value)
-				(*this)(args..., nullptr);
-			else
-				return *this;
-			
-			if constexpr(std::is_same<T, Alignment>::value) {
+		ConsoleString &operator()(T firstArg, Args... args) {
+			if constexpr (std::is_same<T, Alignment>::value) {
 				_alignment = firstArg;
 			}
 			else {
-				throw std::invalid_argument("args");
+				if constexpr (!std::is_same<T, nullptr_t>::value) {
+					throw std::invalid_argument("args");
+				}
 			}
+
+			if constexpr (!std::is_same<T, nullptr_t>::value)
+				(*this)(args..., nullptr);
 
 			return *this;
-
-			/*if conste(typeid(T) == typeid(Alignment))
-				_alignment = firstArg;
-
-			const size_t argSize = (*this)(args...);
-			if constexpr(argSize > sizeof...(args)) {
-				return;
-			}
-			else if constexpr(n > 0) {
-				return (*this)(args...);
-			}
-			else {
-				return x;
-			}*/
 		}
 
 		~ConsoleString() {
@@ -156,7 +143,7 @@ namespace samilton {
 		}
 
 		std::vector<std::string> _str;
-		Alignment _alignment = Alignment::left;
+		std::optional<Alignment> _alignment;
 	};
 
 	class ConsoleRow {
@@ -188,6 +175,23 @@ namespace samilton {
 			return *this;
 		}
 
+		template<typename T, typename... Args>
+		ConsoleRow &operator()(T firstArg, Args... args) {
+			if constexpr (std::is_same<T, Alignment>::value) {
+				_alignment = firstArg;
+			}
+			else {
+				if constexpr (!std::is_same<T, nullptr_t>::value) {
+					throw std::invalid_argument("args");
+				}
+			}
+
+			if constexpr (!std::is_same<T, nullptr_t>::value)
+				(*this)(args..., nullptr);
+
+			return *this;
+		}
+
 		~ConsoleRow() {
 			clear();
 		}
@@ -198,6 +202,7 @@ namespace samilton {
 
 		ConsoleTable *_parent;
 		std::map<size_t, ConsoleString*> _rowData;
+		std::optional<Alignment> _alignment;
 	};
 
 	class ConsoleTable {
@@ -258,7 +263,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void addRow(const std::initializer_list<T> &row) {
 			const size_t tmp = _rowSize;
 			for (size_t i = 0; i < row.size(); i++) {
@@ -290,7 +295,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void addColumn(const std::initializer_list<T> &column) {
 			const size_t tmp = _columnSize;
 			for (size_t i = 0; i < column.size(); i++) {
@@ -322,7 +327,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		void assign(const std::initializer_list<std::initializer_list<T>> &table) {
 			clear();
 			for (size_t i = 0; i < table.size(); i++)
@@ -364,7 +369,7 @@ namespace samilton {
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
-		std::is_same<char*, T>::value>::type>
+		std::is_same<const char*, T>::value>::type>
 		ConsoleTable &operator=(const std::initializer_list<std::initializer_list<T>> &table) {
 			assign(table);
 			return *this;
@@ -494,7 +499,13 @@ namespace samilton {
 					
 					// If cell has data and current line of cell not empty
 					if (table._tableData[i] != nullptr && table._tableData[i]->_rowData[j] != nullptr && k < table._tableData[i]->_rowData[j]->_str.size()) {
-						if (table._alignment == Alignment::centre) {
+						const Alignment cellAlignment = table._tableData[i]->_rowData[j]->_alignment
+							                                ? *(table._tableData[i]->_rowData[j]->_alignment)
+							                                : (table._tableData[i]->_alignment
+								                                   ? *(table._tableData[i]->_alignment)
+								                                   : table._alignment);
+						
+						if (cellAlignment == Alignment::centre) {
 							const size_t leftSpaceInCell = columnWidth[j] - table._tableData[i]->_rowData[j]->_str[k].size();
 
 							size_t leftAlignmentIndent, rightAlignmentIndent;
@@ -513,9 +524,9 @@ namespace samilton {
 							ConsoleTable::_fillStreamByChar(stream, ' ', ' ', table._rightIndent + rightAlignmentIndent);
 						}
 						else {
-							if (table._alignment == Alignment::left)
+							if (cellAlignment == Alignment::left)
 								stream << std::left;
-							else if (table._alignment == Alignment::right)
+							else if (cellAlignment == Alignment::right)
 								stream << std::right;
 
 							stream << table._chars.leftRightSimple;
