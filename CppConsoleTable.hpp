@@ -55,8 +55,19 @@ namespace samilton {
 	public:
 		ConsoleString() = default;
 
-		ConsoleString(const ConsoleString &obj) {
-			*this = obj;
+		ConsoleString(const ConsoleString &obj)
+			: _alignment(obj._alignment)
+			, _str(obj._str)
+		{}
+
+		ConsoleString(ConsoleString &&obj)
+				: _alignment(std::move(obj._alignment))
+				, _str(std::move(obj._str))
+		{}
+
+		void swap(ConsoleString &obj) {
+			_str.swap(obj._str);
+			_alignment.swap(obj._alignment);
 		}
 
 		void clear() {
@@ -99,11 +110,9 @@ namespace samilton {
 			return *this;
 		}
 
-		ConsoleString &operator=(const ConsoleString &obj) {
-			clear();
-			_alignment = obj._alignment;
-			_str = obj._str;
-
+		ConsoleString &operator=(ConsoleString obj) {
+			// implement copy and move 'operator=' at the same time
+			swap(obj);
 			return *this;
 		}
 
