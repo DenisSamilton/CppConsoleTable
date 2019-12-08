@@ -197,6 +197,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+##Будьте внимательны
+Если у вас подключена библиотека windows.h вы можете встретиться с ошибками вида error C2589: '(': illegal token on right side of '::' и прочими. Это связано с тем, что в windows.h переопределён макрос max и используемый алгоритм std::max в библиотеке конфликтует с ним, чтобы решить конфликт подключите макрос #define NOMINMAX перед подключением библиотеки.
+
 ## Контакты
 
 Если у вас есть вопросы касающиеся библиотеки, я хотел бы пригласить вас [открыть вопрос в GitHub](https://github.com/DenisSamilton/CppConsoleTable/issues/new). Пожалуйста опишите ваш запрос, проблему, или вопрос как можно подробнее, также укажите версию утилиты что вы используете, версию вашего компилятора и операционной системы. Открытие вопроса на Github позволяет сотрудничать другим пользователям и авторам этой библиотеки.
