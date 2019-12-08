@@ -198,6 +198,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+## Be careful
+If you have a windows.h library included, you may encounter errors like error C2589: '(': illegal token on right side of '::' and etc. This happens because the max algorithm redefined as macros in windows.h and std::max in the library conflicts with it, to resolve the conflict, connect the #define NOMINMAX macros before connecting the library.
+
 ## Contact
 
 If you have questions regarding the library, I would like to invite you to [open an issue at Github](https://github.com/DenisSamilton/CppConsoleTable/issues/new). Please describe your request, problem, or question as detailed as possible, and also mention the version of the library you are using as well as the version of your compiler and operating system. Opening an issue at Github allows other users and contributors to this library to collaborate.
