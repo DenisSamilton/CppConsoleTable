@@ -1,10 +1,10 @@
 /*
  =========================    Cpp Console Table
- | Cpp | Console | Table |    version 1.3.0
+ | Cpp | Console | Table |    version 1.4.0
  =========================    https://github.com/DenisSamilton/CppConsoleTable
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Copyright (c) 2019 DenisSamilton
+Copyright (c) 2021 DenisSamilton
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ SOFTWARE.
 #include <vector> // vector
 
 namespace samilton {
-	// force declaration
+	// forward declaration
 	class ConsoleTable;
 	class ConsoleRow;
 
@@ -217,11 +217,13 @@ namespace samilton {
 		ConsoleTable() {
 			_alignment = Alignment::left;
 			_leftIndent = _rightIndent = _rowSize = _columnSize = 0;
+			_flagCSV = false;
 		}
 
 		ConsoleTable(const Alignment &alignment) {
 			_alignment = alignment;
 			_leftIndent = _rightIndent = _rowSize = _columnSize = 0;
+			_flagCSV = false;
 		}
 
 		ConsoleTable(const size_t &leftIndent, const size_t &rightIndent, const Alignment &alignment = Alignment::left) {
@@ -229,6 +231,7 @@ namespace samilton {
 			_rightIndent = rightIndent;
 			_alignment = alignment;
 			_rowSize = _columnSize = 0;
+			_flagCSV = false;
 		}
 
 		ConsoleTable(const ConsoleTable &obj) {
@@ -357,6 +360,13 @@ namespace samilton {
 			_chars = chars;
 		}
 
+		ConsoleTable &asCSV(const char& separator = ';') {
+			_flagCSV = true;
+			_CSVseparator = separator;
+
+			return *this;
+		}
+
 		template<class T,
 		class = typename std::enable_if<std::is_arithmetic<T>::value ||
 		std::is_same<std::string, T>::value ||
@@ -384,6 +394,7 @@ namespace samilton {
 			_rightIndent = obj._rightIndent;
 			_rowSize = obj._rowSize;
 			_columnSize = obj._columnSize;
+			_flagCSV = obj._flagCSV;
 
 			for (auto &i : obj._tableData)
 				_tableData[i.first] = new ConsoleRow(*i.second, this);
@@ -413,9 +424,13 @@ namespace samilton {
 
 		TableChars _chars;
 		std::map<size_t, ConsoleRow*> _tableData;
+
 		Alignment _alignment;
 		size_t _leftIndent, _rightIndent;
 		size_t _rowSize, _columnSize;
+
+		bool _flagCSV;
+		char _CSVseparator;
 	};
 
 	inline ConsoleRow &ConsoleTable::operator[](const size_t row){
@@ -446,6 +461,24 @@ namespace samilton {
 		// Return if table is empty
 		if (table._tableData.empty())
 			return stream;
+
+		// Return as CSV if flag is true
+		if (table._flagCSV) {
+			for (size_t i = 0; i < table._rowSize; ++i) {
+				for (size_t j = 0; j < table._columnSize; ++j) {
+					if (table._tableData[i] && table._tableData[i]->_rowData[j]) {
+						for (auto& k : table._tableData[i]->_rowData[j]->_str) {
+							stream << k;
+						}
+					}
+					stream << table._CSVseparator;
+				}
+				stream << std::endl;
+			}
+
+			table._flagCSV = false;
+			return stream;
+		}
 		
 		// Read width member and use it as indentation parameter if nonzero
 		const auto tableIndentation = stream.width() > 0 ? stream.width() : 0;
