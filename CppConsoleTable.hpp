@@ -113,12 +113,12 @@ namespace samilton {
 				_alignment = firstArg;
 			}
 			else {
-				if constexpr (!std::is_same<T, nullptr_t>::value) {
+				if constexpr (!std::is_same<T, std::nullptr_t>::value) {
 					throw std::invalid_argument("args");
 				}
 			}
 
-			if constexpr (!std::is_same<T, nullptr_t>::value)
+			if constexpr (!std::is_same<T, std::nullptr_t>::value)
 				(*this)(args..., nullptr);
 
 			return *this;
@@ -181,12 +181,12 @@ namespace samilton {
 				_alignment = firstArg;
 			}
 			else {
-				if constexpr (!std::is_same<T, nullptr_t>::value) {
+				if constexpr (!std::is_same<T, std::nullptr_t>::value) {
 					throw std::invalid_argument("args");
 				}
 			}
 
-			if constexpr (!std::is_same<T, nullptr_t>::value)
+			if constexpr (!std::is_same<T, std::nullptr_t>::value)
 				(*this)(args..., nullptr);
 
 			return *this;
